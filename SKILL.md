@@ -1,7 +1,7 @@
 ---
 name: imgui-cpp-guis
 description: "Use when writing, reviewing, or debugging Dear ImGui C++ GUI code (windows, widgets, layout, tables, menus, modals, fonts). Targets the 1.92+/1.93 API, gives exact signatures and flags so you stop guessing at the API, and removes the trivial mistakes (Begin/End pairing, ID collisions, obsolete font calls, wrong lifecycle order) that waste tokens and compile cycles."
-version: 1.8.1
+version: 1.9.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -640,7 +640,16 @@ scope = ID collision (the second widget silently operates the first).
     vision reads as proofreading passes too — the same capture surfaced
     "crafted a axe" in the event log (article-aware log strings fix it).
 
-    ## Verification Checklist
+42. **A sub-pixel-radius brush stamp misses pixel centers between stamps —
+    strokes go dotted and flood fills leak through the gaps.** A 0.5-radius
+    circle only colors a pixel whose center is within 0.5 of the stamp
+    center, so stamps marched along a segment skip rows (measured: a 1px
+    barrier leaked a fill through them). For diameter <= 1.5, quantize to
+    the pixel grid and plot directly; circle stamps are for diameter >= 2.
+    (First hit: miniPaint-cpp build, Sep 2026; recipe in
+    `references/paint-apps.md`.)
+
+## Verification Checklist
 
 - [ ] `grep IMGUI_VERSION_NUM imgui.h` — confirmed which API era you're in.
 - [ ] Compiles clean: `bash scripts/build_headless.sh` (0 warnings, runs). It
@@ -878,6 +887,12 @@ without guessing:
   village-sim build: numeric motion mirrors + RMSE gating (frozen/paused
   proof), coincident-entity click tie-break, fill-height+appended-panel
   overflow fix, shared-display env guards, steady-state selftest forcing.
+- `references/paint-apps.md` — native paint/pixel-editor apps (miniPaint-cpp
+  rewrite): layer-as-GL-texture with dirty-rect `glTexSubImage2D` uploads, GPU
+  compositing via `AddImage` alpha tint, the RGBA byte-order contract
+  (IM_COL32-packed = r,g,b,a bytes = zero-conversion upload/save), per-frame
+  IO input (1-frame latency), draft-overlay shapes, `--demo` flag + env-gated
+  fps log for captures, stb vendoring under `-Werror`, vision-outage fallbacks.
 - `templates/game_editor_template.h` — Compile-tested 2D world/editor pattern:
   flat-vector GameObject world, Camera (+y up) with cursor-anchored zoom,
   ImDrawList shape rendering, rotated hit-testing, play-state snapshot
