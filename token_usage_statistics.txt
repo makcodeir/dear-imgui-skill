@@ -1,0 +1,303 @@
+================================================================================
+TOKEN USAGE STATISTICS: imgui-cpp-guis SKILL TRAINING & IMPLEMENTATION
+================================================================================
+Skill:           creative/imgui-cpp-guis
+Target Directory: /home/geek/.hermes/skills/creative/imgui-cpp-guis/
+Source Directory: /home/geek/Documents/programming/Agents/Skills/imgui/
+Date:            2026-09-11
+Model:           deepseek-v4.1-flash / gemini-3.8-flash (Api.avalai.ir)
+================================================================================
+
+SESSION BREAKDOWN:
+
+[Session 1] Building ImGui C++ Hermes Skill
+  - Session ID:        20260911_214628_f029ad
+  - Started:           2026-09-11 21:46:52
+  - Description:       Skill baseline scaffolding, API quickref, patterns & templates
+  - Messages:          221
+  - Tool Calls:        128
+  - LLM API Calls:     89
+  - Input Tokens:      187,960
+  - Output Tokens:     64,096
+  - Cache Read Tokens: 10,591,032
+  - Total Tokens:      10,843,088
+
+[Session 2] Building ImGui C++ Hermes Skill #2
+  - Session ID:        20260911_220623_a56944
+  - Started:           2026-09-11 22:06:23
+  - Description:       Headless test harness, layout validation, verification gates
+  - Messages:          306
+  - Tool Calls:        167
+  - LLM API Calls:     48
+  - Input Tokens:      369,040
+  - Output Tokens:     32,250
+  - Cache Read Tokens: 7,981,354
+  - Total Tokens:      8,382,644
+
+[Session 3] Building ImGui C++ Hermes Skill #3
+  - Session ID:        20260911_222815_d8f30d
+  - Started:           2026-09-11 22:28:15
+  - Description:       Blueprint node graph editor, canvas transforms, bezier wires
+  - Messages:          368
+  - Tool Calls:        197
+  - LLM API Calls:     60
+  - Input Tokens:      380,689
+  - Output Tokens:     38,503
+  - Cache Read Tokens: 10,564,716
+  - Total Tokens:      10,983,908
+
+[Session 4] Real-Time Digital Logic Circuit Simulator in ImGui
+  - Session ID:        20260911_224528_21efd2
+  - Started:           2026-09-11 22:45:28
+  - Description:       Pure ImGui circuit simulator (zero external node libs),
+                       splitter channels, vector gate rendering, decoupled engine,
+                       skill reference & template integration
+  - Messages:          130+
+  - Tool Calls:        60+
+  - LLM API Calls:     69
+  - Input Tokens:      295,939
+  - Output Tokens:     38,726
+  - Cache Read Tokens: 3,082,011
+  - Total Tokens:      3,416,676
+
+[Session 5] Dodo 2D Game Engine (skill validation run) — 2026-09-12
+  - Session ID:        20260912_222542_f9fa24
+  - Started:           2026-09-12 22:25:54
+  - Description:       End-to-end skill validation: built a complete minimal
+                       2D game engine + ImGui editor (world, camera, gizmo,
+                       hierarchy/inspector, play mode, scene save/load) per the
+                       imgui-cpp-guis skill. Plan-first workflow, toolchain
+                       smoke test before planning, headless logic tests
+                       (18/18), render verification, and the vision loop
+                       (screenshot -> vision model) that caught the
+                       fill-width-canvas layout bug no compile could see.
+                       Skill outcome: +capture_for_vision.sh script,
+                       +game_editor_template.h template (+8-check self-test),
+                       SKILL.md v1.0.0 -> v1.1.0 (vision loop section, 3 new
+                       pitfalls verified in the field, checklist item).
+  - Model:             glm-5.3-flash (custom provider)
+  - Messages:          249
+  - Tool Calls:        121
+  - LLM API Calls:     130
+  - Input Tokens:      519,468
+  - Output Tokens:     58,395
+  - Cache Read Tokens: 8,564,736
+  - Total Tokens:      ~9.14M (session still live when recorded; count grows)
+
+[Session 6] Deterministic Platformer + AI-Playability Harness — 2026-09-12
+  - Session ID:        20260912_234644_30669c
+  - Started:           2026-09-12 23:53:24
+  - Description:       Autonomous Mario-style platformer engine in pure ImGui
+                       (procedural ImDrawList visuals, fixed-timestep physics,
+                       coyote/jump-buffer/momentum, AABB tilemap sweeps, 8
+                       goombas, coins, flag) plus an AI-playability
+                       verification harness: FrameInput replay scripts,
+                       telemetry JSON serializer, OpenSSL HTTPS judge client
+                       (no libcurl on box), 25-assertion headless selftest.
+                       Skill outcome: +references/platformer-verification.md,
+                       +templates/PlatformerSim/ (full worked example),
+                       +scripts/capture_frames_grid.sh (motion contact sheet),
+                       capture_for_vision.sh pkill guard, SKILL.md v1.1.1 ->
+                       v1.2.0 (pitfalls 27-28, motion checklist item, vision
+                       loop extension).
+  - Model:             glm-5.3-flash (custom provider)
+  - Messages:          134
+  - Tool Calls:        71
+  - LLM API Calls:     60
+  - Input Tokens:      179,436
+  - Output Tokens:     79,499
+  - Cache Read Tokens: 3,338,240
+  - Total Tokens:      3,592,175
+
+[Session 7] dreamIDE "Project Desk" IDE-style workspace app — 2026-09-14
+  - Session ID:        20260914_114010_6efbcb
+  - Started:           2026-09-14 11:40:27
+  - Description:       Complete single-window developer workspace in pure
+                       ImGui per one shared spec: menu bar + toolbar, project
+                       explorer tree (flat parent_id vector), tabbed editor
+                       (imgui_stdlib, IsItemEdited dirty tracking), inspector,
+                       severity-filtered console, Kanban board with
+                       overlay-text cards, Ctrl+P command palette (arrow/Enter
+                       nav), prefs modal with live 1.92+ UI scaling, chord
+                       shortcuts with typed-input guard, Action-intent state
+                       model with deferred mutations (never mutate vectors
+                       mid-iteration). Builds zero warnings; render verified.
+                       Skill outcome: +references/ide-workspace-apps.md,
+                       +templates/DreamIDE/ (full worked example),
+                       SKILL.md v1.2.1 -> v1.3.0 (workspace-app when-to-use,
+                       2 new pitfalls), build.sh hardened for dual-location
+                       builds (IMGUI_DIR probe).
+  - Model:             glm-5.3-flash (custom provider)
+  - Messages:          130
+  - Tool Calls:        61
+  - LLM API Calls:     89
+  - Input Tokens:      374,246
+  - Output Tokens:     53,282
+  - Cache Read Tokens: 4,638,720
+  - Total Tokens:      5,066,248
+
+[Session 8] Skill update: fold dreamIDE findings into imgui-cpp-guis — 2026-09-14
+  - Session ID:        20260914_121806_f518de
+  - Started:           2026-09-14 12:18:06
+  - Description:       skill-eval (Shape B) run: verified dreamIDE build/run/
+                       render before canonizing, copied sources into
+                       templates/DreamIDE/, wrote ide-workspace-apps.md
+                       reference (deferred-mutation pattern, palette, chords,
+                       card overlay text), SKILL.md when-to-use + pitfalls +
+                       reference entries, v1.3.0 version bump, stale-code
+                       audit re-run (ImGui::Combo confirmed current API per
+                       imgui.h:671), template build re-verified from the
+                       skill tree. Also fixed build.sh path resolution bug
+                       (skill dir and repo share no ancestor).
+  - Model:             glm-5.3-flash (custom provider)
+  - Messages:          83   (live when recorded)
+  - Tool Calls:        46
+  - LLM API Calls:     37
+  - Input Tokens:      171,326
+  - Output Tokens:     21,261
+  - Cache Read Tokens: 2,256,896
+  - Total Tokens:      ~2,449,483 (session live when recorded; grows)
+
+[Session 9] SVG creation capability integrated into the skill — 2026-09-14
+  - Session ID:        20260914_131448_091ff7
+  - Started:           2026-09-14 13:17
+  - Description:       Built the SVG->ImDrawList pipeline from the
+                       Ai-Generated-SVG-Examples showcase repo (20 SMIL
+                       animated SVGs, all converted + strict-compiled + 300
+                       headless frames). Ships: scripts/svg2drawlist.py
+                       (stdlib-only converter, --check/--tint/batch),
+                       templates/svg/ (svg_runtime.h helpers; 12 authored
+                       24x24 GUI SVGs: 8 icons + spinner/dots/progress/pulse;
+                       committed svg_icons_imgui.h; svg_widgets.cpp demo,
+                       GUI + headless self-test dual mode; build.sh using
+                       the static-GLFW recipe), references/svg-for-imgui.md
+                       (mapping tables, authoring subset, 10 empirical
+                       limitations, verification recipe). SKILL.md: When-to-
+                       Use bullet + 3 reference entries, v1.5.0. Vision loop
+                       confirmed the live window (8/8 icons + all animated
+                       widgets present, no clipping).
+  - Findings folded back (from this run's compile/test log):
+    ImClamp/ImLerp are imgui_internal.h (not public); ImVec2 arithmetic
+    operators need IMGUI_DEFINE_MATH_OPERATORS; dl->AddText(ImFont*, size)
+    emits ZERO vertices for an unbaked size (1.92 dynamic fonts) -> use
+    PushFont(NULL, size) + current-font overload, verify text in a WINDOWED
+    run since headless vertex probes false-negative on it; repeating
+    stroke-dasharray patterns don't map to a single dash window (gear ->
+    explicit geometry); GLFW core-profile hint illegal below 3.2.
+  - Model:             qwen3.8-flash (custom provider)
+  - Messages:          127  (live when recorded; grows)
+  - Tool Calls:        63
+  - LLM API Calls:     105
+  - Input Tokens:      252,613
+  - Output Tokens:     124,409
+  - Cache Read Tokens: 15,663,744
+  - Total Tokens:      ~16,040,766 (session live when recorded; grows)
+
+[Session 10] Automated visual verification loop (closed-loop GUI QA) — 2026-09-14
+  - Session ID:        20260914_145253_7be1b5
+  - Started:           2026-09-14 14:52
+  - Description:       Designed + validated the closed-loop visual QA
+                       architecture (act -> settle -> capture -> assert).
+                       Ships templates/vision_loop/: imgui_harness.h
+                       (~330-line header-only UDS control API - flat var/rect
+                       registries, real synthetic clicks via io.Add*Event
+                       at live widget rects, frame counter + deferred
+                       `sync` barrier), loop_demo.cpp (counter/checkbox/
+                       gauge, every state visible >=2 places), drive.py
+                       (stdlib client), closed_loop.sh (launch -> act ->
+                       sync -> capture manifest), build.sh (-Werror,
+                       static-GLFW). references/automated-visual-
+                       verification.md: protocol contract, GLFW mouse
+                       re-queue ordering fact, state-vs-UI action paths,
+                       app-design rules, ImGuiTestEngine/HTTP trade-offs.
+                       SKILL.md v1.6.0: "The Closed Loop" subsection,
+                       When-to-Use bullet, checklist item, Pitfall 30.
+                       Plan first: .hermes/plans/2026-09-14_visual-
+                       verification-loop.md; finalized after user sign-off.
+  - Verification:      4-step loop green on first full run: 3 synthetic
+                       presses took count 0->3; set gauge 0.95; press blue
+                       toggled canvas; negative controls errored loudly;
+                       quit exit 0. Both captures vision-checked: "Count: 3"
+                       in toolbar AND canvas banner, grey->blue canvas,
+                       gauge ~50%->~95% - pixels agreed with every state=
+                       line.
+  - Model:             qwen3.8-flash (custom provider)
+  - Messages:          62   (live when recorded; grows)
+  - Tool Calls:        36
+  - LLM API Calls:     36
+  - Input Tokens:      96,522
+  - Output Tokens:     41,220
+  - Cache Read Tokens: 2,321,280
+  - Total Tokens:      ~2,459,022 (session live when recorded; grows)
+
+================================================================================
+CUMULATIVE METRICS ACROSS ALL SESSIONS (Sessions 1-10):
+================================================================================
+Total User & Agent Messages:    ~2,000   (incl. two unnumbered Sep-14 runs:
+                                          skill-install-instructions update
+                                          and NOTEPAD-80 build, ~186 msgs)
+Total Tool Invocations:         ~1,050
+Total LLM API Calls:            ~810
+Total Input Tokens Processed:   ~3,148,000
+Total Output Tokens Generated:  ~609,000
+Total Cache Read Tokens:        ~74,440,000
+--------------------------------------------------------------------------------
+GRAND TOTAL TOKENS:             ~78,200,000   (Sessions 1-8 as before: ~53.87M
+                                                + Session 9 ~16.04M live
+                                                + Session 10 ~2.46M live
+                                                + unnumbered Sep-14 sessions
+                                                  ~1.21M + ~4.60M)
+================================================================================
+
+SKILL FIELD-TEST NOTES (Session 5, what the skill was worth):
+  - Toolchain smoke test BEFORE planning avoided a dead plan on a machine with
+    no GLFW/SDL dev packages (found static GLFW in an unrelated build tree).
+  - verify_gui_render.sh caught a render-adjacent issue; capture-for-vision
+    (added this session) caught TWO layout bugs the histogram passed:
+    Inspector pushed off-window by a fill-width canvas child, and a clipped
+    status bar. Compiles-clean + exit 0 saw neither.
+  - Pitfalls 22-26 in SKILL.md came straight from this session's compile log
+    (CMake source paths, ImGuiKey vs GLFW keys, SeparatorEx internals,
+    AddPolyline naming, const-correct Find overloads).
+
+SKILL FIELD-TEST NOTES (Session 6, platformer):
+  - The vision loop was invoked BY the app's own brief and paid off twice:
+    layout verification of the live game, and root-causing the determinism
+    anomaly (GUI 1424 frames vs selftest 1242) to a two-instance capture
+    race - now a pkill guard in both capture scripts (Pitfall 27).
+  - The default-font glyph gap (em-dash -> "?") was caught by reading the
+    screenshot log panel, not by any compile/test gate (Pitfall 28).
+  - cmake-integration.md's static-GLFW recipe was reused as-is: the platformer
+    built first try on the same bare toolchain.
+
+SKILL FIELD-TEST NOTES (Sessions 7-8, dreamIDE):
+  - The deferred-mutation pattern (Defer() queue flushed at end of Draw) is
+    the session's transferable lesson: tree/tab/card handlers run INSIDE
+    container iteration, and in-place vector mutation there is UB-shaped.
+    Now Pitfall + full recipe in ide-workspace-apps.md.
+  - The typed-input guard (io.InputQueueCharacters.empty() before acting on
+    chords) came straight from the brief's own requirement and is the kind of
+    detail an unskilled agent ships broken (chord fires mid-typing).
+  - The skill's own capture script (Session 6's pkill guard) was reused as-is
+    for verification; the "only sanctioned way to view a running app" rule
+    held after an earlier session burned iterations hand-rolling captures.
+  - Verification caught a packaging bug a compile can't: templates/DreamIDE/
+    built from the skill tree failed on relative paths (skill dir and repo
+    share no ancestor) - build.sh now probes candidates + IMGUI_DIR override.
+
+SKILL FIELD-TEST NOTES (Session 10, closed loop):
+  - The harness pattern proved itself first try: the whole 4-step act->
+    settle->capture loop ran green with zero script fixes, and the vision
+    cross-check agreed with every state= line. The 3-frame hover/down/up
+    click at the LIVE registered rect worked through ImGui hit-testing on
+    real hardware - the ordering fact (inject after backend _NewFrame,
+    re-inject pos during a click) was verified against imgui_impl_glfw.cpp
+    BEFORE coding, which is why there was no input-injection debugging.
+  - Pitfall 30 (format-truncation with %s into small reply buffers;
+    struct/function tag-name collision) came straight from this session's
+    compile log.
+  - Anomaly worth remembering: a concurrent writer updated SKILL.md while
+    this session was finalizing (duplicate bullets/checklist/reference
+    entries) - dedup pass applied. Skill-dir edits can race; check before
+    assuming you are the only writer.
+================================================================================
