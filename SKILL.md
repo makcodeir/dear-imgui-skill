@@ -1,7 +1,7 @@
 ---
 name: imgui-cpp-guis
 description: "Use when writing, reviewing, or debugging Dear ImGui C++ GUI code (windows, widgets, layout, tables, menus, modals, fonts). Targets the 1.92+/1.93 API, gives exact signatures and flags so you stop guessing at the API, and removes the trivial mistakes (Begin/End pairing, ID collisions, obsolete font calls, wrong lifecycle order) that waste tokens and compile cycles."
-version: 1.9.0
+version: 1.9.2
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -587,17 +587,75 @@ scope = ID collision (the second widget silently operates the first).
         (epsilon ≈ 0.01 world units squared ≪ 1 px, so it only kills the tie race).
         Same guard for hover tooltips.
 
-    37. **A fill-height canvas item + appended bottom panel silently overflows
-        the child (Pitfall 16's vertical twin).** `InvisibleButton(avail())`
-        followed by a log child below → content taller than the child → a silent
-        SCROLLBAR and the log scrolled out of view with zero errors; worse, the
-        scrollbar/avail oscillation rescales a letterboxed view between frames,
-        so harness-registered click rects drift and closed-loop selection flakes.
-        Fix: explicit vertical split —
-        `canvas_h = avail.y - log_h - ItemSpacing.y`. **Meta-lesson:** the vision
-        model flagged "a vertical scrollbar" and "log integrated in the right
-        dashboard" in the FIRST capture and the lead was dismissed as a quirk.
-        Unexpected UI furniture in a vision read is evidence of a layout bug.
+    - **A fill-height canvas item + appended bottom panel silently overflows
+      the child (Pitfall 16's vertical twin).** `InvisibleButton(avail())`
+      followed by a log child below → content taller than the child → a silent
+      SCROLLBAR and the log scrolled out of view with zero errors; worse, the
+      scrollbar/avail oscillation rescales a letterboxed view between frames,
+      so harness-registered click rects drift and closed-loop selection flakes.
+      Fix: explicit vertical split —
+      `canvas_h = avail.y - log_h - ItemSpacing.y`. **Meta-lesson:** the vision
+      model flagged "a vertical scrollbar" and "log integrated in the right
+      dashboard" in the FIRST capture and the lead was dismissed as a quirk.
+      Unexpected UI furniture in a vision read is evidence of a layout bug.
+
+    - **Custom-drawn full-window canvas: do not reposition the ImGui cursor after
+      submitting the canvas item to make drawing commands.** Calling
+      `SetCursorScreenPos()` to a location below/right of an `InvisibleButton`
+      without submitting another item makes ImGui report each frame:
+      `Code uses SetCursorPos()/SetCursorScreenPos() to extend window/parent
+      boundaries. Please submit an item e.g. Dummy() afterwards in order to grow
+      window/parent boundaries.` Prefer making the canvas button the final layout
+      item and draw all visuals via its window's `ImDrawList`; do not move the
+      layout cursor just to represent draw-list extents. Run a real GUI capture
+      and check stderr for repeated `[imgui-error]` diagnostics, not only window
+      existence and palette pixels. (Dino-runner build, Sep 2026: rendered
+      correctly despite hundreds of warnings; removing the trailing cursor move
+      eliminated every diagnostic.)
+
+    - **A letterboxed canvas paints outside itself until you clip it.** World
+      content is drawn through a `scale`/`origin` transform, so anything at a
+      negative or beyond-width world x — a scrolling ground whose pebbles wrap
+      at the left edge, an obstacle entering from the right — lands on the
+      letterbox bars. Nothing errors, the build is clean, and the histogram
+      still shows the right palette; only a vision read catches it (it reported
+      "a slight gap/inconsistency on the far left edge"). Wrap every
+      world-space draw call in `dl->PushClipRect(canvas_min, canvas_max, true)`
+      / `dl->PopClipRect();` — the `true` intersect flag preserves any outer
+      clip. Then assert it numerically: count non-background pixels outside the
+      canvas bbox, which must be exactly 0. When deriving that bbox in the
+      checker, scan EVERY pixel — sampling every 2nd pixel yields an off-by-one
+      edge and a phantom "stray pixels" failure that looks like a real bug.
+      (Dino-runner build, Sep 2026: pebbles wrapping at x<0 bled onto the left
+      bar; a one-line clip rect took the count from 1147-equivalent stray
+      marks to 0.)
+
+    - **Headless rule tests can have unstable timing if collision is assumed.** A
+      runner with one obstacle may collide in the middle of a large `Update()`;
+      subsequent calls are no-ops once GameOver, so a test's assumed runtime can
+      be wrong. Prefer explicit deterministic state setup for collision-edge tests
+      (or calculate the obstacle/player overlap from the model), and separately
+      verify score progression in a run interval known to precede collision. Keep
+      game rules independent of ImGui/GLFW so they can be built and run as a
+      standalone test target. Two sibling traps that produce red tests for
+      GREEN code (Dino-runner rebuild, Sep 2026 — three failures, none of them
+      game bugs): (a) a staged test that clears `obstacles` must ALSO freeze the
+      spawner (`game.spawn_timer = 999.0f;`), or a fresh obstacle arrives
+      mid-loop and kills a player the test never intended to model; and (b) an
+      assertion reading the test's OWN local copy of an entity still reports the
+      pre-`Update()` position, because `Update()` mutates the vector's copy, not
+      yours — assert on the container's end state (e.g. `obstacles.empty()`
+      after it scrolled off) instead of a stale local struct.
+
+    - **Capture helper's histogram pipeline may exit with SIGPIPE under `pipefail`.**
+      `sort -rn | head -12` can make its producer exit 141 even though the image
+      capture, histogram, and window check all succeeded. Treat that status
+      separately from application health: verify the screenshot file, exact
+      palette pixel counts, process liveness during capture, and stderr diagnostics.
+      Do not blindly rerun an identical capture loop; use the already-produced PNG
+      and independently inspect it (e.g. with Python Pillow/Counter if available).
+      This is a helper-script robustness issue, not a reason to trust only the
+      process exit status.
 
     38. **Contact-sheet vision verdicts on 2-3 px entities are unreliable.** A
         4-frame grid of a RUNNING village sim was judged "frozen, not even a
@@ -649,6 +707,35 @@ scope = ID collision (the second widget silently operates the first).
     (First hit: miniPaint-cpp build, Sep 2026; recipe in
     `references/paint-apps.md`.)
 
+43. **A screenshot helper that falls back to "any visible window" silently
+    verifies the WRONG app.** `xdotool search --name "$TITLE" | head -1` with a
+    `|| tail -1` "pick something" fallback evaluates that fallback on the FIRST
+    loop iteration — before your window has mapped — so it latches onto a
+    terminal or a sibling app, and every subsequent PASS/FAIL describes those
+    pixels. Symptom seen live (Dino runner, Sep 2026): idle frames "drifted"
+    (RMSE 9605) while running frames were "frozen" (RMSE exactly 0) — inverted
+    results, because the app was never captured at all. Fix: require an exact
+    title match and fail if it never maps, always echo the matched window's name
+    + geometry in the output, and gate any fallback behind an explicit opt-in.
+    Two sibling traps found in the same script:
+    - **Settle before asserting drift.** The first frame captured after a window
+      maps can be a half-painted / focus-ring repaint (measured: 49920 B vs
+      46343 B for the same static screen), so an "idle pair must be identical"
+      check measures the paint race, not the app. Poll until two consecutive
+      frames are bit-identical, then take the control pair.
+    - **Never `-trim` the diff image that `compare a b diff.png` writes.** For
+      EQUAL pixels ImageMagick paints a *faded copy of the reference frame*, so
+      the trim returns the CANVAS bbox — it reported a confident "51.1% of the
+      window changed" on two frames whose RMSE was exactly 0. Use
+      `convert a b -compose difference -composite -colorspace gray -threshold 5%
+      -trim +repage` instead (collapses to 1x1 = 0.0% on identical frames).
+
+    **Meta-lesson: a gate you have never seen fail is not evidence.** Run the
+    motion gate once with a no-op action key and confirm it exits 1 (measured:
+    `ACT_KEY=F13` → motion FAIL rmse=0 + missing entity colour → exit 1) before
+    quoting a PASS from it. All three traps above are now encoded in
+    `scripts/verify_game_motion.sh`.
+
 ## Verification Checklist
 
 - [ ] `grep IMGUI_VERSION_NUM imgui.h` — confirmed which API era you're in.
@@ -697,8 +784,12 @@ scope = ID collision (the second widget silently operates the first).
       AND the vision read of each settle-synced capture matches `state=`
       (`references/automated-visual-verification.md`).
 - [ ] **For games/sims, MOTION is verified, not assumed** — a static capture
-      cannot show the player moving or counters ticking. Run
-      `bash scripts/capture_frames_grid.sh ./myapp "Title" 4 2` and give the
+      cannot show the player moving or counters ticking. First run the
+      model-free numeric gate:
+      `bash scripts/verify_game_motion.sh ./myapp "Title"` (idle control pair
+      bit-identical + post-input pair differing + changed-pixel bbox localized
+      + `EXPECT_COLORS` painted + quit key exits 0; exit 1 on any FAIL). Then
+      run `bash scripts/capture_frames_grid.sh ./myapp "Title" 4 2` and give the
       tiled contact sheet to the vision tool with a motion question — but for
       small entities (2-3 px dots) contact sheets read as "frozen"; confirm
       with numeric position mirrors or pixel RMSE pairs (running > 0, paused
@@ -741,6 +832,11 @@ For games and simulations, add the time dimension with
 `capture_frames_grid.sh` (N frames over time, tiled into one image) and ask
 about MOTION: is anything moving between frames, does movement match the
 controls, are any frames frozen?
+
+Run `verify_game_motion.sh` FIRST for games/sims: it is the numeric gate, so
+the vision read only has to explain motion you already proved exists (and it is
+the only cheap way to see the gate fail — run it with a no-op action key once
+and confirm exit 1 before trusting a PASS).
 
 **Closing the loop (act → settle → capture → assert).** The capture scripts
 above are one-way: they can look but not touch. For interactive verification,
@@ -918,6 +1014,14 @@ without guessing:
 - `scripts/capture_frames_grid.sh` — capture N frames over time, timestamp and
   tile them into one contact sheet, so a vision model can verify MOTION
   (moving entities, camera scroll, ticking HUD) with a single call.
+- `scripts/verify_game_motion.sh` — **model-free pass/fail motion gate** for
+  games/sims (no LLM call, exit 1 on any FAIL): idle-control pair must be
+  bit-identical, the post-input pair must differ, the changed-pixel bbox must be
+  localized, every `EXPECT_COLORS` triple must be painted in a running frame,
+  and the quit key must exit 0. Requires an exact window-title match and has
+  deliberately NO "pick any window" fallback (that fallback silently verifies a
+  different app's pixels — see Pitfall 43); it leaves the frames plus a
+  difference image for the vision follow-up.
 - `references/automated-visual-verification.md` — the CLOSED loop: UDS control
   protocol contract, frame-sync rules (GLFW re-queues OS mouse events every
   frame — inject after backends, before NewFrame; 3-frame hover/down/up

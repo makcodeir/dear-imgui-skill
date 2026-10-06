@@ -244,16 +244,78 @@ SESSION BREAKDOWN:
   - Total Tokens:      ~5,810,909
 
 ================================================================================
+[Session 14] Build Google-Dino runner in C++ / Dear ImGui (~live session)
+  - Session IDs:       20260929_221525_df8832 (plan, 22:16, gpt-6-luna)
+                       20260929_222648_4e133e (implement + verify, 22:26)
+                       20260929_225725_ad1fa1 (writeback + motion gate, 22:57, live)
+  - Started:           2026-09-29 22:16
+  - Description:       Executed the dino plan from the 22:16 session in
+                       trxgoogle/: src/game.h (dependency-free DinoGame rules -
+                       fixed 1/120 s step, xorshift RNG, AABB collision with 3 px
+                       inset, speed + score ramp, one Press()/Release() action
+                       covering start/jump/restart, variable-height jump cut) +
+                       src/main.cpp (GLFW 3.4 via FetchContent + vendored ImGui
+                       1.92.9b GLFW/OpenGL3, letterboxed 600x150 procedural
+                       ImDrawList canvas, fixed-timestep accumulator, on-screen
+                       START/RESTART button, Esc to quit) + tests/game_test.cpp
+                       (56 asserts, RED -> GREEN) + CMakeLists.txt + README.md.
+                       Verified: clean configure + build from scratch with 0
+                       warnings, ctest green, driven GUI run (xdotool) with an
+                       env-gated DINO_LOG state trace (score 0->40->82->105,
+                       gameover t=4.0 best=105, restart score=0 best kept,
+                       Esc exit code 0), 12/12 pixel checks (static ready-pair
+                       RMSE exactly 0 vs running pair > 0, jump rise 99 px, HUD
+                       live, overlays present then cleared, 0 stray px outside
+                       the canvas) and a vision read of all four frames.
+                       Skill contributions (v1.9.1): NEW letterbox-clip pitfall
+                       (world content bleeds onto the letterbox bars without
+                       PushClipRect/PopClipRect; plus the every-2nd-pixel bbox
+                       off-by-one that fakes a stray-pixel failure) and an
+                       extension of the headless-rule-test pitfall with the
+                       spawn-timer-freeze and stale-local-copy traps that
+                       produced 3 red tests for green game code.
+                       Skill writeback v1.9.2 then added a MODEL-FREE automation
+                       gate, scripts/verify_game_motion.sh, generalising the
+                       hand-rolled /tmp driver + Pillow checker: idle-control pair
+                       must be bit-identical, the post-input pair must differ
+                       (RMSE > 0), the changed-pixel bbox must be localized,
+                       EXPECT_COLORS must be painted, the quit key must exit 0,
+                       with exit 1 on any FAIL and frames + a diff image left for
+                       the vision follow-up. Validated BOTH ways against the same
+                       binary: positive (ACT_KEY=space) 8/8 PASS, exit 0;
+                       falsification (ACT_KEY=F13, a no-op key) motion FAIL
+                       rmse=0 + missing entity colour, exit 1 - a gate never seen
+                       to fail is not evidence. Building it exposed three real
+                       traps, now Pitfall 43: the "pick any window" fallback
+                       latched onto the WRONG window (idle frames "drifted" rmse
+                       9605 while running frames were "frozen" rmse 0 - inverted,
+                       because the game was never captured), the first capture
+                       after a window maps is a half-painted repaint (49920 vs
+                       46343 B for the same static screen) so you must settle
+                       before asserting drift, and -trim on the diff image that
+                       compare writes returns the CANVAS bbox (a confident 51.1%
+                       "changed" on two frames whose RMSE was exactly 0).
+  - Model:             deepseek-v4.1-flash
+  - Messages:          256  (100 plan + 140 implement + 16 writeback)
+  - Tool Calls:        151  (60 + 83 + 8)
+  - LLM API Calls:     113  (39 + 56 + 18)
+  - Input Tokens:      581,440  (117 + 479,266 + 102,057)
+  - Output Tokens:     116,580  (20,654 + 68,476 + 27,450)
+  - Cache Read Tokens: 8,105,337  (2,388,165 + 4,438,286 + 1,278,886)
+  - Total Tokens:      ~8,803,357  (row 3 still ticking; the mid-task block
+                       written at 22:53 carried MY estimates of the live row,
+                       so these are corrected against state.db ground truth)
+
 CUMULATIVE METRICS ACROSS ALL SESSIONS:
 ================================================================================
-Total User & Agent Messages:    2,685+
-Total Tool Invocations:         1,466+
-Total LLM API Calls:            1,127
-Total Input Tokens Processed:   4,416,151
-Total Output Tokens Generated:  1,049,824
-Total Cache Read Tokens:        81,851,461
+Total User & Agent Messages:    2,941+
+Total Tool Invocations:         1,617+
+Total LLM API Calls:            1,240
+Total Input Tokens Processed:   4,997,591
+Total Output Tokens Generated:  1,166,404
+Total Cache Read Tokens:        89,956,798
 --------------------------------------------------------------------------------
-GRAND TOTAL TOKENS:             87,317,436
+GRAND TOTAL TOKENS:             96,120,793
 ================================================================================
 
 SKILL FIELD-TEST NOTES (keyed by project; the parenthetical session numbers
@@ -311,4 +373,26 @@ from the [Session N] blocks above):
     this session was finalizing (duplicate bullets/checklist/reference
     entries) - dedup pass applied. Skill-dir edits can race; check before
     assuming you are the only writer.
+
+(Dino runner — [Session 14], what the skill was worth):
+  - The plan from the 22:16 session held unchanged: Tasks 1-4 executed in
+    order, no replanning, and the toolchain facts it recorded (no system GLFW,
+    ImGui 1.92.9b in the DBSCAN tree, live DISPLAY=:1) were all still accurate.
+  - The skill's version-1.92 font rule was the only API lookup needed:
+    PushFont(NULL, style.FontSizeBase * 2.0f) for the HUD/overlay text, taken
+    straight from the SKILL.md signature table and imgui.h - zero compile
+    cycles lost to font API guessing, on a tree whose dynamic-font API breaks
+    every pre-1.92 tutorial.
+  - The letterbox-clip pitfall and the two headless-test traps are now IN the
+    skill because this build hit them: the clip bug was invisible to the
+    compile and to the histogram, and the three red tests were all harness
+    bugs (spawn stream, stale local copy), not game bugs. Worth stating
+    plainly: the vision read caught the clip bug, the log trace caught the
+    game-over/restart truth, and neither gate alone would have been enough.
+  - v1.9.2 added `scripts/verify_game_motion.sh` from this build: the first
+    script here whose payoff is a NONZERO EXIT CODE rather than an image for a
+    model to read. Its own first draft shipped three verification bugs (window
+    fallback, paint race, diff-image trim) that were only found by running it
+    against the app it was written for, then running it again with a no-op key.
+    Validate verification tooling with a failing case, not only the happy path.
 ================================================================================
